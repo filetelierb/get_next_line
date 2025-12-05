@@ -6,120 +6,43 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:55 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/04 11:28:55 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/04 18:38:48 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	**sp_malloc(char const *s, char c, size_t *len)
-{
-	size_t	i;
-	size_t	count;
-	char	**sp_mem;
-
-	i = 0;
-	count = 0;
-	if (!s)
-		return (NULL);
-	*len = ft_strlen(s);
-	while (s[i])
-	{
-		if (s[i] != c)
-		{
-			while (s[i] != c && s[i])
-				i ++;
-			count ++;
-		}
-		else
-			i ++;
-	}
-	sp_mem = ft_calloc((count + 1), sizeof(char *));
-	if (sp_mem == NULL)
-		return (NULL);
-	return (sp_mem);
-}
-
-static char	*get_word(char const *s, char c, size_t *start, size_t len)
-{
-	char	*w_end;
-	char	*new_word;
-	size_t	w_len;
-
-	w_len = 0;
-	w_end = ft_strchr(&s[*start], c);
-	if (w_end == 0)
-		w_len = (size_t)(&s[len] - &s[*start]);
-	else
-		w_len = (size_t)(w_end - &s[*start]);
-	new_word = ft_substr(s, *start, w_len);
-	*start = *start + w_len - 1;
-	return (new_word);
-}
-
-static void	free_sp(char **sp)
+char	*ft_strchr(const char *s, int c)
 {
 	size_t	i;
 
 	i = 0;
-	while (sp[i])
+	while (1)
 	{
-		free(sp[i]);
-		i ++;
+		if (s[i] == (char)c)
+			return ((char *)&s[i]);
+		if (s[i] == '\0')
+			return (0);
+		i++;
 	}
-	free(sp);
 }
 
-char	**ft_split(char const *s, char c)
+void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
-	size_t	i;
-	size_t	len;
-	size_t	sp_i;
-	char	**split;
+	unsigned char		*dst_s;
+	const unsigned char	*src_s;
+	size_t				i;
 
-	i = 0;
-	sp_i = 0;
-	split = sp_malloc(s, c, &len);
-	if (split == 0)
+	if (!dst && !src)
 		return (NULL);
-	while (s[i])
-	{
-		if (s[i] != c)
-		{
-			split[sp_i] = get_word(s, c, &i, len);
-			if (split[sp_i] == NULL)
-			{
-				free_sp(split);
-				return (NULL);
-			}
-			sp_i ++;
-		}
-		i ++;
-	}
-	return (split);
-}
-
-size_t	ft_strlcat(char *dst, const char *src, size_t size)
-{
-	size_t		dst_len;
-	size_t		src_len;
-	size_t		i;
-	size_t		init_l;
-
-	src_len = ft_strlen(src);
+	dst_s = (unsigned char *)dst;
+	src_s = (const unsigned char *)src;
 	i = 0;
-	if (size == 0)
-		return (src_len);
-	dst_len = ft_strlen(dst);
-	if (dst_len < size)
-		init_l = dst_len;
-	else
-		init_l = size;
-	while (dst_len + i < size - 1 && i < src_len)
+	while (i < n)
 	{
-		dst[dst_len + i] = src[i];
-		i ++;
+		dst_s[i] = src_s[i];
+		i++;
 	}
-	dst[dst_len + i] = '\0';
-	return (init_l + src_len);
+	return (dst);
 }
+

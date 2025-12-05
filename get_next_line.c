@@ -6,19 +6,20 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/04 11:53:27 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/05 14:56:40 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*expand_mem(char *s, ssize_t *buff_size)
+char	*expand_mem(char *s)
 {
 	char	*new_s;
+	ssize_t	new_size;
 	ssize_t	i;
 
-	*buff_size = *buff_size + BUFFER_SIZE;
-	new_s = malloc(*buff_size + 1);
+	new_size = sizeof(s) + BUFFER_SIZE;
+	new_s = malloc(new_size);
 	if (!new_s)
 		return (NULL);
 	while (s[i])
@@ -31,33 +32,33 @@ char	*expand_mem(char *s, ssize_t *buff_size)
 	return (new_s);
 }
 
-char	**extract_file_lines(int fd)
+void	free_filedata(t_filedata *fdata)
 {
-	char		*chunk_buffer[BUFFER_SIZE];
-	char		*file_buffer;
-	char		**lines;
-	ssize_t		bytes_read;
-	ssize_t		file_len;
-	ssize_t		file_buff_size;
+	if (fdata->tempstore)
+		free(fdata->tempstore);
+	free(fdata);
+}
 
-	file_buff_size = BUFFER_SIZE;
-	file_buffer = malloc(file_buff_size + 1);
-	if (!file_buffer)
-		return (NULL);
-	file_len = 0;
-	bytes_read = read(fd, chunk_buffer, BUFFER_SIZE);
-	while (bytes_read)
+void	read_chunk(int fd, char *dest)
+{
+	
+}
+
+char	*find_line(t_filedata fdata, int fd)
+{
+	char	*next_line;
+	size_t	bytes_read;
+	size_t	t_index;
+
+	temp_index = 0;
+	if (fdata->tempstore)
 	{
-		file_len = ft_strlcat(file_buffer, chunk_buffer, bytes_read + file_len + 1);
-		bytes_read = read(fd, chunk_buffer, BUFFER_SIZE);
-		if (bytes_read > 0)
-			file_buffer = expand_mem(file_buffer, file_buff_size);
+		while(fdata->tempstore[t_index])
+		{
+			
+		}
 	}
-	lines = ft_split((const char *)file_buffer,'\n');
-	free(file_buffer);
-	if (!lines)
-		return (NULL);
-	return (lines);	
+
 }
 
 char	*get_next_line(int fd)
@@ -65,8 +66,12 @@ char	*get_next_line(int fd)
 	static t_filedata	*filedata;
 
 	if (!filedata)
+	{
 		filedata = malloc(sizeof(*filedata));
-	if (!filedata)
-		return (NULL);
-	filedata->file_lines = extract_file_lines(fd);
+		if (!filedata)
+			return (NULL);
+		filedata->fd = fd;
+		filedata->tempstore = NULL;
+	}
+	return (find_line(filedata, fd));
 }
