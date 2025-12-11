@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:55 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 16:35:54 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 18:22:44 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ char	*expand_mem(char *s)
 
 	new_size = sizeof(s) + BUFFER_SIZE;
 	new_s = malloc(new_size);
+	i = 0;
 	if (!new_s)
 		return (NULL);
 	while (s[i])
