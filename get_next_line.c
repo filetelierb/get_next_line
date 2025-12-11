@@ -6,22 +6,33 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 18:28:11 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 19:35:52 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static void	free_handler(t_handler *h)
+static t_handler *free_handler(t_handler *h, int free_all, int free_nl, int free_tmp)
 {
 	if (h)
 	{
-		if (h->next_line)
+		if (h->next_line && (free_all > 0 || free_nl > 0))
+		{
 			free(h->next_line);
-		if (h->tempstore)
+			h->next_line = NULL;
+		}
+		if (h->tempstore && (free_all > 0 || free_tmp > 0))
+		{
 			free(h->tempstore);
-		free(h);
+			h->tempstore = NULL;
+		}
+		if (free_all > 0)
+		{
+			free(h);
+			return (NULL);
+		}
 	}
+	return (h);
 }
 
 static t_handler	*extract_substr(t_handler *h, char *end)
@@ -32,7 +43,7 @@ static t_handler	*extract_substr(t_handler *h, char *end)
 
 	i = 0;
 	j = 0;
-	len = ((ssize_t)&end - (ssize_t)&(h->tempstore[i]));
+	len = end - h->tempstore;
 	h->next_line = malloc(len + 1);
 	if (!h->next_line)
 		return (NULL);
@@ -41,9 +52,9 @@ static t_handler	*extract_substr(t_handler *h, char *end)
 		h->next_line[i] = h->tempstore[i];
 		i ++;
 	}
-	while (h->tempstore[i + j])
+	while (h->tempstore[i + j + 1])
 	{
-		h->tempstore[j] = h->tempstore[i + j];
+		h->tempstore[j] = h->tempstore[i + j +1];
 		j ++;
 	}
 	h->tempstore[j] = '\0';
@@ -60,9 +71,9 @@ static t_handler	*load_chunk(t_handler *h, char *buffer, int fd, ssize_t *b)
 	new_len = h->len;
 	if (*b > 0)
 	{
-		if (*b + h->len + 1 > (ssize_t)sizeof(h->tempstore))
+		if (*b + h->len + 1 > (ssize_t)sizeof((h->tempstore)))
 		{
-			h->tempstore = expand_mem(h->tempstore);
+			expand_tempstore(h);
 			if (!h->tempstore)
 				return (NULL);
 		}
@@ -113,18 +124,19 @@ char	*get_next_line(int fd)
 		h->tempstore = malloc(BUFFER_SIZE + 1);
 		if (!(h->tempstore))
 		{
-			free_handler(h);
+			free(h);
 			return (NULL);
 		}
 		h->tempstore[0] = '\0';
 		h->len = 0;
+		h->cap = BUFFER_SIZE + 1;
 		h->next_line = NULL;
 	}
 	else
-		free(h->next_line);
+		h = free_handler(h, 0, 1, 0);
 	if (!update_next_line(h, fd))
 	{
-		free_handler(h);
+		h = free_handler(h, 1, 0, 0);
 		return (NULL);
 	}
 	return (h->next_line);

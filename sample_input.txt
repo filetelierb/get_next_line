@@ -1,0 +1,3 @@
+First line\n
+Second line is longer than the buffer size to force multiple reads.
+Third line (no trailing newline at EOF)
