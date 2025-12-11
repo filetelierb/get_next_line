@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:58 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 18:25:26 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 18:28:16 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ typedef struct s_nlhandler
 }	t_handler;
 
 char	*get_next_line(int fd);
-//char	*ft_strchr(const char *s, int c);
+char	*ft_strchr(const char *s, int c);
 //void	free_tmpdata(t_handler *td);
-
+char	*expand_mem(char *s);
 
 #endif

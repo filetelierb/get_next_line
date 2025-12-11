@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 18:24:40 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 18:28:11 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ char	*get_next_line(int fd)
 		h->tempstore = malloc(BUFFER_SIZE + 1);
 		if (!(h->tempstore))
 		{
-			free_tmpdata(h);
+			free_handler(h);
 			return (NULL);
 		}
 		h->tempstore[0] = '\0';
@@ -124,7 +124,7 @@ char	*get_next_line(int fd)
 		free(h->next_line);
 	if (!update_next_line(h, fd))
 	{
-		free_tmpdata(h);
+		free_handler(h);
 		return (NULL);
 	}
 	return (h->next_line);
