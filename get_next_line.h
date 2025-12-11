@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:58 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 16:37:22 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 17:00:00 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #  define BUFFER_SIZE 10
 # endif
 # include <unistd.h>
-//# include <stddef.h>
+# include <stdlib.h>
 typedef struct s_nlhandler
 {
 	char	*tempstore;
