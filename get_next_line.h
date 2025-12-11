@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:58 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/09 18:43:40 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 16:37:22 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,16 @@
 # endif
 # include <unistd.h>
 //# include <stddef.h>
-typedef struct s_tempstore
+typedef struct s_nlhandler
 {
 	char	*tempstore;
 	char	*next_line;
 	ssize_t	len;
-} t_tempstore;
+}	t_handler;
 
 char	*get_next_line(int fd);
 char	*ft_strchr(const char *s, int c);
-void	free_tmpdata(t_tempstore *td);
+void	free_tmpdata(t_handler *td);
 char	*expand_mem(char *s);
 
 #endif

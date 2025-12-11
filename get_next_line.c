@@ -6,20 +6,25 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/09 21:03:53 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/11 16:37:04 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	set_tempdata_len(t_tempstore *tempdata, ssize_t new_len)
+void	free_handler(t_handler *h)
 {
-	tempdata->tempstore[new_len] = '\0';
-	tempdata->next_line[tempdata->len - new_len] = '\0';
-	tempdata->len = new_len;
+	if (h)
+	{
+		if (h->next_line)
+			free(h->next_line);
+		if (h->tempstore)
+			free(h->tempstore);
+		free(h);
+	}
 }
 
-char	*extract_substr(t_tempstore *tempdata, char *end)
+char	*extract_substr(t_handler *h, char *end)
 {
 	ssize_t	len;
 	ssize_t	i;
@@ -27,55 +32,55 @@ char	*extract_substr(t_tempstore *tempdata, char *end)
 
 	i = 0;
 	j = 0;
-	len = (ssize_t)(&end - &(tempdata->tempstore[i]));
-	tempdata->next_line = malloc(len + 1);
-	if (!tempdata->next_line)
+	len = (ssize_t)(&end - &(h->tempstore[i]));
+	h->next_line = malloc(len + 1);
+	if (!h->next_line)
 		return (NULL);
-	while(i < len)
+	while (i < len)
 	{
-		tempdata->next_line[i] = tempdata->tempstore[i];
+		h->next_line[i] = h->tempstore[i];
 		i ++;
 	}
-	while (tempdata->tempstore[i + j])
+	while (h->tempstore[i + j])
 	{
-		tempdata->tempstore[j] = tempdata->tempstore[i + j];
+		h->tempstore[j] = h->tempstore[i + j];
 		j ++;
 	}
-	tempdata->tempstore[j] = '\0';
-	tempdata->len = j;
-	tempdata->next_line[i] = '\0';
-	return (tempdata);
+	h->tempstore[j] = '\0';
+	h->len = j;
+	h->next_line[i] = '\0';
+	return (h);
 }
 
-t_tempstore	*load_chunk(t_tempstore *tempdata, char *buffer, int fd, ssize_t *b)
+t_handler	*load_chunk(t_handler *h, char *buffer, int fd, ssize_t *b)
 {
-	ssize_t new_len;
-	
+	ssize_t	new_len;
+
 	*b = read(fd, buffer, BUFFER_SIZE);
-	new_len = tempdata->len;
+	new_len = h->len;
 	if (*b > 0)
 	{
-		if(*b + tempdata->len + 1 > sizeof(tempdata->tempstore))
+		if (*b + h->len + 1 > sizeof(h->tempstore))
 		{
-			tempdata->tempstore = expand_mem(tempdata->tempstore);
-			if (!tempdata->tempstore)
+			h->tempstore = expand_mem(h->tempstore);
+			if (!h->tempstore)
 			{
-				free_tmpdata(tempdata->tempstore);
+				free_tmpdata(h->tempstore);
 				return (NULL);
 			}
 		}
-		while(new_len < tempdata->len + *b)
+		while (new_len < h->len + *b)
 		{
-			tempdata->tempstore[new_len] = buffer[new_len - tempdata->len];
+			h->tempstore[new_len] = buffer[new_len - h->len];
 			new_len ++;
 		}
-		tempdata->tempstore[new_len] = '\0';
-		tempdata->len = new_len;
-		return (tempdata);
+		h->tempstore[new_len] = '\0';
+		h->len = new_len;
+		return (h);
 	}
 }
 
-char	*get_line(t_tempstore *td, int fd)
+char	*update_next_line(t_handler *td, int fd)
 {
 	char	*line_end;
 	char	buffer[BUFFER_SIZE + 1];
@@ -86,10 +91,7 @@ char	*get_line(t_tempstore *td, int fd)
 	{
 		td->next_line = extract_substr(&td, line_end);
 		if (!td->next_line)
-		{
-			free_tmpdata(td);
 			return (NULL);
-		}
 		return (td->next_line);
 	}
 	if (!load_chunk(td, buffer, fd, &bytes))
@@ -97,34 +99,37 @@ char	*get_line(t_tempstore *td, int fd)
 	if (bytes < BUFFER_SIZE)
 	{
 		td->next_line = extract_substr(&td, &(td->tempstore[td->len]));
-		{
-			free_tmpdata(td);
+		if (!td->next_line)
 			return (NULL);
-		}
 	}
-		
+	return (td->next_line);
 }
 
 char	*get_next_line(int fd)
 {
-	static t_tempstore	*tempdata;
+	static t_handler	*h;
 
-	if (!tempdata)
+	if (!h)
 	{
-		tempdata = malloc(sizeof(t_tempstore));
-		if (!tempdata)
+		h = malloc(sizeof(t_handler));
+		if (!h)
 			return (NULL);
-		tempdata->tempstore = malloc(BUFFER_SIZE + 1);
-		if (!(tempdata->tempstore))
+		h->tempstore = malloc(BUFFER_SIZE + 1);
+		if (!(h->tempstore))
 		{
-			free_tmpdata(tempdata);
+			free_tmpdata(h);
 			return (NULL);
 		}
-		tempdata->tempstore[0] = '\0';
-		tempdata->len = 0;
-		tempdata->next_line = NULL;
+		h->tempstore[0] = '\0';
+		h->len = 0;
+		h->next_line = NULL;
 	}
 	else
-		free(tempdata->next_line);
-	return (get_line(&tempdata, fd));
+		free(h->next_line);
+	if (!update_next_line(&h, fd))
+	{
+		free_tmpdata(&h);
+		return (NULL);
+	}
+	return (h->next_line);
 }
