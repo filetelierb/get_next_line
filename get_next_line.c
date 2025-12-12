@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 19:35:52 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/12 10:01:04 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,9 @@ static t_handler	*extract_substr(t_handler *h, char *end)
 		h->next_line[i] = h->tempstore[i];
 		i ++;
 	}
-	while (h->tempstore[i + j + 1])
+	while (h->tempstore[i + j])
 	{
-		h->tempstore[j] = h->tempstore[i + j +1];
+		h->tempstore[j] = h->tempstore[i + j];
 		j ++;
 	}
 	h->tempstore[j] = '\0';
@@ -132,8 +132,6 @@ char	*get_next_line(int fd)
 		h->cap = BUFFER_SIZE + 1;
 		h->next_line = NULL;
 	}
-	else
-		h = free_handler(h, 0, 1, 0);
 	if (!update_next_line(h, fd))
 	{
 		h = free_handler(h, 1, 0, 0);
