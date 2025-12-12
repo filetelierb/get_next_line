@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:55 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/11 18:54:56 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/12 14:26:36 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,6 @@ t_handler	*expand_tempstore(t_handler *td)
 	new_s[i] = '\0';
 	free(td->tempstore);
 	td->tempstore = new_s;
+	td->cap = new_size;
 	return (td);
 }
