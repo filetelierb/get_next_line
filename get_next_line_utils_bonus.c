@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:55 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/15 19:50:38 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/15 22:43:48 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_strchr(const char *s, int c)
 {
@@ -63,6 +63,10 @@ void	free_handler(t_handler *h, int free_all, int free_nl, int free_tmp)
 		{
 			free(h->tempstore);
 			h->tempstore = NULL;
+		}
+		if (free_all > 0)
+		{
+			free(h);
 		}
 	}
 }

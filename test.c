@@ -4,7 +4,7 @@
  * If no args are given, it reads from stdin (press Ctrl+D to end).
  */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>

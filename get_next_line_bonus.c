@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/15 19:49:32 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/15 23:51:22 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static t_handler	*extract_substr(t_handler *h, char *end, int offset)
 {
@@ -82,20 +82,44 @@ static char	*fetch_line(t_handler *h, int fd)
 	return (fetch_line(h, fd));
 }
 
+static t_handler	*get_handler(t_handler *h, int fd)
+{
+	t_handler	*new_h;
+
+	if (h->fd == fd)
+		return (h);
+	else if (h->nh)
+		return (get_handler(h->nh, fd));
+	else
+	{
+		new_h = malloc(sizeof(t_handler));
+		if (!new_h)
+			return (NULL);
+		new_h->fd = fd;
+		return (new_h);
+	}
+}
+
 char	*get_next_line(int fd)
 {
-	static t_handler	h;
+	static t_handler	init_h;
+	t_handler			*h;
 	char				*line;
-
-	init_handler(&h, fd);
-	if (!h.tempstore)
+	
+	if (init_h.fd <= 0)
+		init_h.fd = fd;
+	h = get_handler(&init_h, fd);
+	if (!h)
 		return (NULL);
-	line = fetch_line(&h, fd);
+	init_handler(h, fd);
+	if (!(h->tempstore))
+		return (NULL);
+	line = fetch_line(h, fd);
 	if (!line)
 	{
-		free_handler(&h, 1, 0, 0);
+		free_handler(h, 1, 0, 0);
 		return (NULL);
 	}
-	h.next_line = NULL;
+	h->next_line = NULL;
 	return (line);
 }
