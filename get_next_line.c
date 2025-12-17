@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/17 12:15:49 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/17 17:25:20 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ static char	*fetch_line(t_handler *h, int fd)
 		return (NULL);
 	if (bytes == 0 && h->len > 0)
 	{
-		extract_substr(h, h->tempstore + h->len, 1);
+		extract_substr(h, h->tempstore + h->len, 2);
 		return (h->next_line);
 	}
 	else if (bytes <= 0)

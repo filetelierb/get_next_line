@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 15:59:23 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/15 23:51:22 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/17 18:23:52 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static t_handler	*extract_substr(t_handler *h, char *end, int offset)
 	ssize_t	i;
 
 	i = 0;
-	h->next_line = malloc(end - h->tempstore + offset);
+	h->next_line = malloc(end - h->tempstore + offset + 1);
 	if (!h->next_line)
 		return (NULL);
 	while (i <= end - h->tempstore)
@@ -74,7 +74,7 @@ static char	*fetch_line(t_handler *h, int fd)
 		return (NULL);
 	if (bytes == 0 && h->len > 0)
 	{
-		extract_substr(h, h->tempstore + h->len, 1);
+		extract_substr(h, h->tempstore + h->len - 1, 1);
 		return (h->next_line);
 	}
 	else if (bytes <= 0)
@@ -96,28 +96,36 @@ static t_handler	*get_handler(t_handler *h, int fd)
 		if (!new_h)
 			return (NULL);
 		new_h->fd = fd;
+		new_h->nh = NULL;
+		new_h->tempstore = NULL;
+		new_h->next_line = NULL;
+		new_h->len = 0;
+		new_h->cap = 0;
+		h->nh = new_h;
 		return (new_h);
 	}
 }
 
 char	*get_next_line(int fd)
 {
-	static t_handler	init_h;
+	static t_handler	init_h = {NULL, NULL, 0, 0, NULL, -1};
 	t_handler			*h;
 	char				*line;
-	
-	if (init_h.fd <= 0)
-		init_h.fd = fd;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
 	h = get_handler(&init_h, fd);
 	if (!h)
 		return (NULL);
-	init_handler(h, fd);
-	if (!(h->tempstore))
+	if (!init_handler(h))
+	{
+		free_h(&init_h, h);
 		return (NULL);
+	}
 	line = fetch_line(h, fd);
 	if (!line)
 	{
-		free_handler(h, 1, 0, 0);
+		free_h(&init_h, h);
 		return (NULL);
 	}
 	h->next_line = NULL;

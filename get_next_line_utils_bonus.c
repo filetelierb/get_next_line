@@ -6,7 +6,7 @@
 /*   By: fletelie <fletelie@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/03 16:00:55 by fletelie          #+#    #+#             */
-/*   Updated: 2025/12/15 22:43:48 by fletelie         ###   ########.fr       */
+/*   Updated: 2025/12/17 18:23:38 by fletelie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,34 +50,32 @@ t_handler	*expand_tempstore(t_handler *td)
 	return (td);
 }
 
-void	free_handler(t_handler *h, int free_all, int free_nl, int free_tmp)
+void	free_h(t_handler *head, t_handler *h)
 {
-	if (h)
+	t_handler	*curr_node;
+
+	if (!h || h == head)
+		return ;
+	curr_node = head;
+	while (curr_node && curr_node->nh && curr_node->nh != h)
+		curr_node = curr_node->nh;
+	if (h->next_line)
 	{
-		if (h->next_line && (free_all > 0 || free_nl > 0))
-		{
-			free(h->next_line);
-			h->next_line = NULL;
-		}
-		if (h->tempstore && (free_all > 0 || free_tmp > 0))
-		{
-			free(h->tempstore);
-			h->tempstore = NULL;
-		}
-		if (free_all > 0)
-		{
-			free(h);
-		}
+		free(h->next_line);
+		h->next_line = NULL;
 	}
+	if (h->tempstore)
+	{
+		free(h->tempstore);
+		h->tempstore = NULL;
+	}
+	if (curr_node && curr_node->nh == h)
+		curr_node->nh = h->nh;
+	free(h);
 }
 
-t_handler	*init_handler(t_handler *h, int fd)
+t_handler	*init_handler(t_handler *h)
 {
-	if (fd < 0 || BUFFER_SIZE < 0 || read(fd, 0, 0))
-	{
-		free_handler(h, 1, 0, 0);
-		return (NULL);
-	}
 	if (!h->tempstore)
 	{
 		h->tempstore = malloc(BUFFER_SIZE + 1);
